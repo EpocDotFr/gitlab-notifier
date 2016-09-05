@@ -2,6 +2,7 @@ from envparse import env, Env
 import arrow
 import click
 import gitlab
+import plyer
 
 
 def debug(message, err=False):
@@ -13,15 +14,18 @@ def debug(message, err=False):
 
 
 @click.command()
-def run():
+@click.option('--project', '-p', type=int, help='Gitlab project ID')
+def run(project):
     Env.read_envfile('.env')
 
     gl = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
 
     try:
-        builds = gl.project_builds.list(project_id=env('GITLAB_PROJECT'))
+        builds = gl.project_builds.list(project_id=project)
     except Exception as e:
         debug(e, err=True)
+
+    # plyer.notification.notify(title='Tu pue', message='ahah d gsdhsdhhd hsdh g shgdsggsd sdggsd fdsfsf f', app_name='Test')
 
 if __name__ == '__main__':
     run()

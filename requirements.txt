@@ -3,3 +3,5 @@ click
 arrow
 python-gitlab
 plyer
+tinydb
+ujson
