@@ -20,6 +20,7 @@ TODO
 
 ## How it works
 
-This script, once started, polls the [GitLab builds API](http://docs.gitlab.com/ce/api/builds.html) every 30 seconds indefinitely.
-It maintain a [local database](https://tinydb.readthedocs.io/en/latest/) of every builds that are in progress, thus
-allowing us to display [native notifications](https://plyer.readthedocs.io/en/latest/) when build statuses are updated.
+This script, once started, polls the [GitLab builds API](http://docs.gitlab.com/ce/api/builds.html) of a specific
+project every 60 seconds (by default) indefinitely. It maintain a [local database](https://tinydb.readthedocs.io/en/latest/) of
+every builds that are in progress, thus allowing us to display [native notifications](https://plyer.readthedocs.io/en/latest/)
+when build statuses are updated.

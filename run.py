@@ -34,7 +34,7 @@ def run(project):
     #       2.1.1 Yes: Notify
     #       2.1.2 No: do nothing, next build
     #     2.2 No: insert it in the DB, notify
-    # 3. Repeat every 30 seconds
+    # 3. Repeat every 60 seconds
 
 if __name__ == '__main__':
     run()
