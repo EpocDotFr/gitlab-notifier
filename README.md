@@ -1,6 +1,6 @@
 # Gitlab Notifier
 
-A Python script that (natively) notifies about [Gitlab](https://about.gitlab.com/) builds progress.
+A Python script that (natively) notifies you about [GitLab](https://about.gitlab.com/) builds progress.
 
 ## Prerequisites
 
