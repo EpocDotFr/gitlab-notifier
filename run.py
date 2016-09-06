@@ -28,13 +28,14 @@ def run(project):
     # plyer.notification.notify(title='Tu pues', message='ahah d gsdhsdhhd hsdh g shgdsggsd sdggsd fdsfsf f', app_name='Test')
 
     # TODO
-    # 1. Get all desired builds from a certain project
-    # 2. For each builds: is it in the DB?
-    #     2.1 Yes: was its status changed?
-    #       2.1.1 Yes: Notify
-    #       2.1.2 No: do nothing, next build
-    #     2.2 No: insert it in the DB, notify
-    # 3. Repeat every 60 seconds
+    # 1. Get all desired builds from a certain project filtered by status
+    # 2. Filter by user and or branch
+    # 3. For each builds: is it in the DB?
+    #     3.1 Yes: was its status changed?
+    #       3.1.1 Yes: Notify
+    #       3.1.2 No: do nothing, next build
+    #     3.2 No: insert it in the DB, notify
+    # 4. Repeat every 60 seconds
 
 if __name__ == '__main__':
     run()
