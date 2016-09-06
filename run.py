@@ -1,9 +1,11 @@
 from envparse import env, Env
+from plyer.utils import platform
+from plyer import notification
 import time
 import arrow
 import click
 import gitlab
-import plyer
+import os
 
 
 def debug(message, err=False):
@@ -86,12 +88,14 @@ class GitLabNotifier:
 
         message += '.'
 
+        app_icon = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'gitlab.ico' if platform == 'win' else 'gitlab.png')
+
         try:
-            plyer.notification.notify(
+            notification.notify(
                 title='Build #{} {}'.format(build.id, build.status),
                 message=message,
                 app_name='GitLab Notifier',
-                app_icon='gitlab.ico'
+                app_icon=app_icon
             )
         except Exception as e:
             debug(e, err=True)
