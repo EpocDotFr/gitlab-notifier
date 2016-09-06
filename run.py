@@ -63,11 +63,7 @@ class GitLabNotifier:
                     if self.builds_list[build.id] != build.status: # Build status changed
                         debug('  > Build #{} status changed'.format(build.id))
 
-                        if build.status in ['failed', 'success', 'canceled']: # We don't need it anymore
-                            del self.builds_list[build.id]
-                        else:
-                            self.builds_list[build.id] = build.status
-
+                        self.builds_list[build.id] = build.status
                         self.notify(build)
                     else: # Build status unchanged: next build
                         debug('  > Build #{} status unchanged'.format(build.id))
