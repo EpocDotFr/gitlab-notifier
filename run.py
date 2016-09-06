@@ -34,6 +34,8 @@ class GitLabNotifier:
 
 
     def run(self):
+        debug('Running')
+
         while True:
             try:
                 debug('Getting builds')
@@ -100,9 +102,6 @@ class GitLabNotifier:
 @click.option('--project', '-p', type=int, help='Gitlab project ID')
 def run(project):
     gln = GitLabNotifier(project)
-
-    debug('Running thread')
-
     gln.run()
 
 
