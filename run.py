@@ -29,12 +29,12 @@ def run(project):
 
     # TODO
     # 1. Get all desired builds from a certain project filtered by status
-    # 2. Filter by user and or branch
-    # 3. For each builds: is it in the DB?
+    # 2. Filter by user and/or branch
+    # 3. For each builds: is it in the internal list?
     #     3.1 Yes: was its status changed?
     #       3.1.1 Yes: Notify
     #       3.1.2 No: do nothing, next build
-    #     3.2 No: insert it in the DB, notify
+    #     3.2 No: insert it in the internal list, notify
     # 4. Repeat every 60 seconds
 
 if __name__ == '__main__':
