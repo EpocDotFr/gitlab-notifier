@@ -1,4 +1,5 @@
 from envparse import env, Env
+import time
 import arrow
 import click
 import gitlab
@@ -13,29 +14,89 @@ def debug(message, err=False):
 ), err=err)
 
 
+class GitLabNotifier:
+    project_id = None
+    gitlab = None
+
+    builds_list = {}
+
+    def __init__(self, project_id):
+        Env.read_envfile('.env')
+
+        debug('Initializing')
+
+        self.project_id = project_id
+        self.gitlab = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
+
+
+    def run(self):
+        while True:
+            try:
+                debug('Getting builds')
+
+                builds = self.gitlab.project_builds.list(project_id=self.project_id, scope=['failed', 'success', 'canceled'])
+            except Exception as e:
+                debug(e, err=True)
+                return
+
+            debug('Analyzing builds')
+
+            for build in builds:
+                if build.user.username != env('FILTER_USERNAME'):
+                    debug('  > Build #{} not owned by user {}'.format(build.id, env('FILTER_USERNAME')))
+                    continue
+
+                if build.id not in self.builds_list: # Build isn't in the internal list
+                    debug('  > Build #{} not in the internal list'.format(build.id))
+
+                    self.builds_list[build.id] = build.status
+                    self.notify(build)
+                else: # Build is in the internal list
+                    if self.builds_list[build.id] != build.status: # Build status changed
+                        debug('  > Build #{} status changed'.format(build.id))
+
+                        self.builds_list[build.id] = build.status
+                        self.notify(build)
+                    else: # Build status unchanged: next build
+                        debug('  > Build #{} status unchanged'.format(build.id))
+
+                        continue
+
+            time.sleep(env('POLL_INTERVAL', cast=int))
+
+
+    def notify(self, build):
+        message = 'On branch {}, created {}'.format(build.ref, arrow.get(build.created_at).to(env('TIMEZONE')).humanize())
+
+        if build.started_at:
+            message += ', started ' + arrow.get(build.started_at).to(env('TIMEZONE')).humanize()
+
+        if build.finished_at:
+            message += ', finished ' + arrow.get(build.finished_at).to(env('TIMEZONE')).humanize()
+
+        message += '.'
+
+        try:
+            plyer.notification.notify(
+                title='Build #{} {}'.format(build.id, build.status),
+                message=message,
+                app_name='GitLab Notifier',
+                app_icon='gitlab.ico'
+            )
+        except Exception as e:
+            debug(e, err=True)
+            return
+
+
 @click.command()
 @click.option('--project', '-p', type=int, help='Gitlab project ID')
 def run(project):
-    Env.read_envfile('.env')
+    gln = GitLabNotifier(project)
 
-    gl = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
+    debug('Running thread')
 
-    try:
-        builds = gl.project_builds.list(project_id=project)
-    except Exception as e:
-        debug(e, err=True)
+    gln.run()
 
-    # plyer.notification.notify(title='Tu pues', message='ahah d gsdhsdhhd hsdh g shgdsggsd sdggsd fdsfsf f', app_name='Test')
-
-    # TODO
-    # 1. Get all desired builds from a certain project filtered by status
-    # 2. Filter by user and/or branch
-    # 3. For each builds: is it in the internal list?
-    #     3.1 Yes: was its status changed?
-    #       3.1.1 Yes: Notify
-    #       3.1.2 No: do nothing, next build
-    #     3.2 No: insert it in the internal list, notify
-    # 4. Repeat every 60 seconds
 
 if __name__ == '__main__':
     run()
