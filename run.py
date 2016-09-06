@@ -29,12 +29,16 @@ class GitLabNotifier:
         self.gitlab = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
 
 
+    def get_date(self, date):
+        return arrow.get(date).to(env('TIMEZONE'))
+
+
     def run(self):
         while True:
             try:
                 debug('Getting builds')
 
-                builds = self.gitlab.project_builds.list(project_id=self.project_id, scope=['failed', 'success', 'canceled'])
+                builds = self.gitlab.project_builds.list(project_id=self.project_id)
             except Exception as e:
                 debug(e, err=True)
                 return
@@ -42,8 +46,8 @@ class GitLabNotifier:
             debug('Analyzing builds')
 
             for build in builds:
-                if build.user.username != env('FILTER_USERNAME'):
-                    debug('  > Build #{} not owned by user {}'.format(build.id, env('FILTER_USERNAME')))
+                if build.user.username != env('FILTER_USERNAME'): # Build wasn't started by the specified user
+                    debug('  > Build #{} not started by user {}'.format(build.id, env('FILTER_USERNAME')))
                     continue
 
                 if build.id not in self.builds_list: # Build isn't in the internal list
@@ -55,7 +59,11 @@ class GitLabNotifier:
                     if self.builds_list[build.id] != build.status: # Build status changed
                         debug('  > Build #{} status changed'.format(build.id))
 
-                        self.builds_list[build.id] = build.status
+                        if build.status in ['failed', 'success', 'canceled']: # We don't need it anymore
+                            del self.builds_list[build.id]
+                        else:
+                            self.builds_list[build.id] = build.status
+
                         self.notify(build)
                     else: # Build status unchanged: next build
                         debug('  > Build #{} status unchanged'.format(build.id))
@@ -66,13 +74,13 @@ class GitLabNotifier:
 
 
     def notify(self, build):
-        message = 'On branch {}, created {}'.format(build.ref, arrow.get(build.created_at).to(env('TIMEZONE')).humanize())
+        message = 'On branch {}, created {}'.format(build.ref, self.get_date(build.created_at).humanize())
 
         if build.started_at:
-            message += ', started ' + arrow.get(build.started_at).to(env('TIMEZONE')).humanize()
+            message += ', started ' + self.get_date(build.started_at).humanize()
 
         if build.finished_at:
-            message += ', finished ' + arrow.get(build.finished_at).to(env('TIMEZONE')).humanize()
+            message += ', finished ' + self.get_date(build.finished_at).humanize()
 
         message += '.'
 
