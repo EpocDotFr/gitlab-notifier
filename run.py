@@ -31,8 +31,8 @@ class GitLabNotifier:
         self.gitlab = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
 
 
-    def get_date(self, date):
-        return arrow.get(date).to(env('TIMEZONE'))
+    def get_humanized_date(self, date):
+        return arrow.get(date).to(env('TIMEZONE')).humanize()
 
 
     def run(self):
@@ -74,13 +74,13 @@ class GitLabNotifier:
 
 
     def notify(self, build):
-        message = 'On branch {}, created {}'.format(build.ref, self.get_date(build.created_at).humanize())
+        message = 'On branch {}, created {}'.format(build.ref, self.get_humanized_date(build.created_at))
 
         if build.started_at:
-            message += ', started ' + self.get_date(build.started_at).humanize()
+            message += ', started ' + self.get_humanized_date(build.started_at)
 
         if build.finished_at:
-            message += ', finished ' + self.get_date(build.finished_at).humanize()
+            message += ', finished ' + self.get_humanized_date(build.finished_at)
 
         message += '.'
 
