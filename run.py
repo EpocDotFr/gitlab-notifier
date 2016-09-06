@@ -13,7 +13,7 @@ def debug(message, err=False):
         arrow.now(env('TIMEZONE')).format('MMM, D YYYY HH:mm:ss'),
         'ERR ' if err else 'INFO',
         message
-), err=err)
+    ), err=err)
 
 
 class GitLabNotifier:
@@ -30,10 +30,8 @@ class GitLabNotifier:
         self.project_id = project_id
         self.gitlab = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
 
-
     def get_humanized_date(self, date):
         return arrow.get(date).to(env('TIMEZONE')).humanize()
-
 
     def run(self):
         debug('Running')
@@ -71,7 +69,6 @@ class GitLabNotifier:
                         continue
 
             time.sleep(env('POLL_INTERVAL', cast=int))
-
 
     def notify(self, build):
         message = 'On branch {}, created {}'.format(build.ref, self.get_humanized_date(build.created_at))
