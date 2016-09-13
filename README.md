@@ -30,6 +30,12 @@ python run.py --project=4
 
 `--project` is a GitLab project ID.
 
+Best usage is to run it as a daemon or service (you probably don't want an ever-running terminal window).
+
+  - On Windows, use the [Non-Sucking Service Manager](http://nssm.cc/) (you'll prevent headaches, trust me)
+  - On Linux, use [Supervisor](http://supervisord.org/), or a [daemon](http://blog.scphillips.com/posts/2013/07/getting-a-python-script-to-run-in-the-background-as-a-service-on-boot/) or even a [cron job running at boot/reboot time](http://www.cyberciti.biz/faq/linux-execute-cron-job-after-system-reboot/)
+  - On Mac OS, use [launchctl](http://stackoverflow.com/questions/9522324/running-python-in-background-on-os-x)
+
 ## How it works
 
 This script, once started, polls the [GitLab builds API](http://docs.gitlab.com/ce/api/builds.html) of a specific
