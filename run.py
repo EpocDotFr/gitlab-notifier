@@ -81,7 +81,7 @@ class GitLabNotifier:
 
         message += '.'
 
-        app_icon = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'gitlab.ico' if platform == 'win' else 'gitlab.png')
+        app_icon = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources', build.status + '.ico' if platform == 'win' else build.status + '.png')
 
         try:
             notification.notify(
