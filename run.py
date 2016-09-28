@@ -47,9 +47,16 @@ class GitLabNotifier:
 
             debug('Analyzing builds')
 
+            filter_username = env('FILTER_USERNAME', default=None)
+            filter_stage = env('FILTER_STAGE', default=None)
+
             for build in builds:
-                if build.user.username != env('FILTER_USERNAME'): # Build wasn't started by the specified user
+                if filter_username and build.user.username != filter_username: # Build wasn't started by the specified user
                     debug('  > Build #{} not started by user {}'.format(build.id, env('FILTER_USERNAME')))
+                    continue
+
+                if filter_stage and build.stage != filter_stage:
+                    debug('  > Build #{} not in stage {}'.format(build.id, env('filter_stage')))
                     continue
 
                 if build.id not in self.builds_list: # Build isn't in the internal list
@@ -85,7 +92,7 @@ class GitLabNotifier:
 
         try:
             notification.notify(
-                title='Build #{} {}'.format(build.id, build.status),
+                title='Build #{} ({}) {}'.format(build.id, build.name, build.status),
                 message=message,
                 app_name='GitLab Notifier',
                 app_icon=app_icon

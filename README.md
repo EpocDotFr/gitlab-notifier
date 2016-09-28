@@ -20,7 +20,8 @@ Available configuration parameters are:
   - `GITLAB_ENDPOINT` Root URL to your GitLab instance
   - `GITLAB_TOKEN` Token used to access your GitLab instance API. You can create one in **Profile Settings** > **Personal Access Tokens**
   - `POLL_INTERVAL` Interval, in seconds, when the script will check for updates
-  - `FILTER_USERNAME` A GitLab username to filter builds by (you probably don't want to be spammed by your coworkers builds)
+  - `FILTER_USERNAME` A GitLab username to filter builds by (you probably don't want to be spammed by your coworkers builds) (optional)
+  - `FILTER_STAGE` Only filter builds in this stage name (optional)
 
 ## Usage
 
