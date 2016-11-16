@@ -16,7 +16,6 @@ Copy the `.env.example` file to `.env` and fill in the configuration parameters.
 
 Available configuration parameters are:
 
-  - `TIMEZONE` Self-explanatory parameter
   - `GITLAB_ENDPOINT` Root URL to your GitLab instance
   - `GITLAB_TOKEN` Token used to access your GitLab instance API. You can create one in **Profile Settings** > **Personal Access Tokens**
   - `POLL_INTERVAL` Interval, in seconds, when the script will check for updates

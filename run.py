@@ -2,18 +2,19 @@ from envparse import env, Env
 from plyer.utils import platform
 from plyer import notification
 import time
-import arrow
 import click
 import gitlab
 import os
+import sys
+import logging
 
 
-def debug(message, err=False):
-    click.echo('{} - {} - {}'.format(
-        arrow.now(env('TIMEZONE')).format('MMM, D YYYY HH:mm:ss'),
-        'ERR ' if err else 'INFO',
-        message
-    ), err=err)
+def debug(message, err=False, terminate=False):
+    """Log a regular or error message to the standard output, optionally terminating the script."""
+    logging.getLogger().log(logging.ERROR if err else logging.INFO, message)
+
+    if terminate:
+        sys.exit(1)
 
 
 class GitLabNotifier:
@@ -29,9 +30,6 @@ class GitLabNotifier:
 
         self.project_id = project_id
         self.gitlab = gitlab.Gitlab(env('GITLAB_ENDPOINT'), env('GITLAB_TOKEN'))
-
-    def get_humanized_date(self, date):
-        return arrow.get(date).to(env('TIMEZONE')).humanize()
 
     def run(self):
         debug('Running')
@@ -78,13 +76,13 @@ class GitLabNotifier:
             time.sleep(env('POLL_INTERVAL', cast=int))
 
     def notify(self, build):
-        message = 'On branch {}, created {}'.format(build.ref, self.get_humanized_date(build.created_at))
+        message = 'On branch {}, created {}'.format(build.ref, build.created_at)
 
         if build.started_at:
-            message += ', started ' + self.get_humanized_date(build.started_at)
+            message += ', started ' + build.started_at
 
         if build.finished_at:
-            message += ', finished ' + self.get_humanized_date(build.finished_at)
+            message += ', finished ' + build.finished_at
 
         message += '.'
 
@@ -105,6 +103,14 @@ class GitLabNotifier:
 @click.command()
 @click.option('--project', '-p', type=int, help='Gitlab project ID')
 def run(project):
+    logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%d/%m/%Y %H:%M:%S',
+        stream=sys.stdout
+    )
+
+    logging.getLogger().setLevel(logging.INFO)
+
     gln = GitLabNotifier(project)
     gln.run()
 

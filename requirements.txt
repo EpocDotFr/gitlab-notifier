@@ -1,5 +1,4 @@
 envparse
 click
-arrow
 python-gitlab
 plyer
